@@ -1,11 +1,17 @@
 #include "PinChangeInterrupt.h"   // NicoHood's library
+
 #define USE_BUTTONS 1
+
 #define ENC_BUTTON_DEBOUNCE 50
+
 #include <FastLED.h>
-#define NUM_LEDS 35
+
+#define NUM_LEDS 14
+
 #define DATA_PIN 16
 
 CRGB leds[NUM_LEDS];
+
 
 // Adjusted for use with limited PCINT devices, such as Pro Micro
 const int NUM_ENCODERS = 5;
@@ -20,8 +26,8 @@ int encoderValues[NUM_ENCODERS] = {512, 512, 512, 512, 512};    // set these to 
 int encoderMute[NUM_ENCODERS] = {0, 0, 0, 0, 0};                // unused unless using buttons as mute
 const int enc_inc = 1023/20;                                   // set this to the step size each 'click' will increment/decrement
                                                                 // e.g. 1023/100 means roughly 100 'clicks' between 0% and 100% volume (moving 10 each click, between 0 and 1023)
-void setup() {   
-    //sketch DEEJ
+void setup() {  
+  //sketch DEEJ 
   for(int i = 0; i < NUM_ENCODERS; i++){
     pinMode(encoderPinsA[i], INPUT);     // change to INPUT if using external pullup resistors
     pinMode(encoderPinsB[i], INPUT);     // change to INPUT if using external pullup resistors   
@@ -60,33 +66,30 @@ void loop() {
   #endif
 
   //sketch LED
-      //sketch LED
     int numLedsToLight0 = map(encoderValues[0], 1023, 0, 1, 7);
     int numLedsToLight1 = map(encoderValues[1], 1023, 0, 8, 14);
     int numLedsToLight2 = map(encoderValues[2], 1023, 0, 15, 21);
     int numLedsToLight3 = map(encoderValues[3], 1023, 0, 22, 28);
     int numLedsToLight4 = map(encoderValues[4], 1023, 0, 29, 35);
 
-
-  FastLED.clear();
-  for(int led = 0; led < numLedsToLight0; led++) { 
+    FastLED.clear();
+  for(int led = 1; led < numLedsToLight0; led++) { 
       leds[led] = CRGB::LightSeaGreen; 
   }
-  for(int led = 0; led < numLedsToLight1; led++) { 
+  for(int led = 8; led < numLedsToLight1; led++) { 
       leds[led] = CRGB::LightSeaGreen; 
   }
-  for(int led = 0; led < numLedsToLight2; led++) { 
+  for(int led = 15; led < numLedsToLight2; led++) { 
       leds[led] = CRGB::LightSeaGreen; 
   }
-  for(int led = 0; led < numLedsToLight3; led++) { 
+  for(int led = 22; led < numLedsToLight3; led++) { 
       leds[led] = CRGB::LightSeaGreen; 
   }
-  for(int led = 0; led < numLedsToLight4; led++) { 
+  for(int led = 29; led < numLedsToLight4; led++) { 
       leds[led] = CRGB::LightSeaGreen; 
+  }
 
   FastLED.show();
-  
-  
 }
 
 
