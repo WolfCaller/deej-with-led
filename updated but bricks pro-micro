@@ -2,7 +2,7 @@
 #define USE_BUTTONS 1
 #define ENC_BUTTON_DEBOUNCE 50
 #include <FastLED.h>
-#define NUM_LEDS 14
+#define NUM_LEDS 35
 #define DATA_PIN 16
 
 CRGB leds[NUM_LEDS];
