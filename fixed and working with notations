@@ -1,14 +1,9 @@
 #include "PinChangeInterrupt.h"   // NicoHood's library
-
 #define USE_BUTTONS 1
-
 #define ENC_BUTTON_DEBOUNCE 50
-
-#include <FastLED.h>
-
-#define NUM_LEDS 35
-
-#define DATA_PIN 16
+#include <FastLED.h>   // FastLED Library
+#define NUM_LEDS 35   // Define Number of LED's total
+#define DATA_PIN 16   // Data Pin used for LED 
 
 CRGB leds[NUM_LEDS];
 
@@ -46,7 +41,7 @@ void setup() {
   Serial.begin(9600);
 
   //sketch LED
-  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);  // Define Type of LED, Data pin as set above, and RGB order of your strip. 
 }
 
 void loop() {
@@ -66,30 +61,30 @@ void loop() {
   #endif
 
   //sketch LED
-    int numLedsToLight0 = map(encoderValues[0], 1023, 0, 1, 7);
+    int numLedsToLight0 = map(encoderValues[0], 1023, 0, 1, 7);   // 1023 max enc val, 0 low enc val, swap if your leds light up opposite. 1 is first led for this encoder,7 is last led. change led values for each enc.
     int numLedsToLight1 = map(encoderValues[1], 1023, 0, 8, 14);
     int numLedsToLight2 = map(encoderValues[2], 1023, 0, 15, 21);
     int numLedsToLight3 = map(encoderValues[3], 1023, 0, 22, 28);
     int numLedsToLight4 = map(encoderValues[4], 1023, 0, 29, 35);
 
-    FastLED.clear();
-  for(int led = 1; led < numLedsToLight0; led++) { 
-      leds[led] = CRGB::LightSeaGreen; 
+    FastLED.clear();   // clears leds that are not in use
+  for(int led = 1; led < numLedsToLight0; led++) {    // led 1 is first led for enc 0, led 8 is first led for enc 1 etc.
+      leds[led] = CRGB::Magenta; 
   }
-  for(int led = 8; led < numLedsToLight1; led++) { 
-      leds[led] = CRGB::LightSeaGreen; 
+  for(int led = 8; led < numLedsToLight1; led++) {
+      leds[led] = CRGB::Magenta; 
   }
   for(int led = 15; led < numLedsToLight2; led++) { 
-      leds[led] = CRGB::LightSeaGreen; 
+      leds[led] = CRGB::Magenta; 
   }
   for(int led = 22; led < numLedsToLight3; led++) { 
-      leds[led] = CRGB::LightSeaGreen; 
+      leds[led] = CRGB::Magenta; 
   }
   for(int led = 29; led < numLedsToLight4; led++) { 
-      leds[led] = CRGB::LightSeaGreen; 
+      leds[led] = CRGB::Magenta; 
   }
 
-  FastLED.show();
+  FastLED.show();   // lights leds to match enc values
 }
 
 
