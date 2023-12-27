@@ -2,23 +2,24 @@
 #define USE_BUTTONS 1
 #define ENC_BUTTON_DEBOUNCE 50
 #include <FastLED.h>   // FastLED Library
-#define NUM_LEDS 35   // Define Number of LED's total
+#define NUM_LEDS 28   // Define Number of LED's total
 #define DATA_PIN 16   // Data Pin used for LED 
+#define LED_PWR 15   // pin to determine if pc in on
 
 CRGB leds[NUM_LEDS];
 
 
 // Adjusted for use with limited PCINT devices, such as Pro Micro
 const int NUM_ENCODERS = 5;
-const int encoderPinsA[NUM_ENCODERS] = {8, 9, 10, 14, 15};  // may also use 16 - any PCINT pin
-const int encoderPinsB[NUM_ENCODERS] = {2, 3, 4, 5, 6};     // arbitrary - pick any IO
+const int encoderPinsA[NUM_ENCODERS] = {8, 9, 10, 14};  // may also use 16 - any PCINT pin - CLK on encoder 
+const int encoderPinsB[NUM_ENCODERS] = {2, 3, 4, 5};     // arbitrary - pick any IO - DT on encoder
 
 #ifdef USE_BUTTONS
-  const int encoderButtons[NUM_ENCODERS] = {A0, A1, A2, A3, 7};  // can use analog pins, they will act as digital pins for this
+  const int encoderButtons[NUM_ENCODERS] = {A0, A1, A2, A3};  // can use analog pins, they will act as digital pins for this
 #endif
 
-int encoderValues[NUM_ENCODERS] = {512, 512, 512, 512, 512};    // set these to the initial values your deej will start with (0-1023)
-int encoderMute[NUM_ENCODERS] = {0, 0, 0, 0, 0};                // unused unless using buttons as mute
+int encoderValues[NUM_ENCODERS] = {512, 512, 512, 512};    // set these to the initial values your deej will start with (0-1023)
+int encoderMute[NUM_ENCODERS] = {0, 0, 0, 0};                // unused unless using buttons as mute
 const int enc_inc = 1023/20;                                   // set this to the step size each 'click' will increment/decrement
                                                                 // e.g. 1023/100 means roughly 100 'clicks' between 0% and 100% volume (moving 10 each click, between 0 and 1023)
 void setup() {  
@@ -30,19 +31,22 @@ void setup() {
       pinMode(encoderButtons[i], INPUT_PULLUP);
     #endif  
   }
+  
 
   // A new set of ISRs will need to be added for each encoder, see bottom of sketch
   attachPCINT(digitalPinToPCINT(encoderPinsA[0]), EN0_A_ISR, FALLING);
   attachPCINT(digitalPinToPCINT(encoderPinsA[1]), EN1_A_ISR, FALLING);
   attachPCINT(digitalPinToPCINT(encoderPinsA[2]), EN2_A_ISR, FALLING);
   attachPCINT(digitalPinToPCINT(encoderPinsA[3]), EN3_A_ISR, FALLING);
-  attachPCINT(digitalPinToPCINT(encoderPinsA[4]), EN4_A_ISR, FALLING);
  
   Serial.begin(9600);
 
   //sketch LED
   FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);  // Define Type of LED, Data pin as set above, and RGB order of your strip. 
+  pinMode(LED_PWR, INPUT);   //Set LED_PWR pin to INPUT
+
 }
+
 
 void loop() {
   //sketch DEEJ
@@ -61,30 +65,31 @@ void loop() {
   #endif
 
   //sketch LED
-    int numLedsToLight0 = map(encoderValues[0], 1023, 0, 1, 7);   // 1023 max enc val, 0 low enc val, swap if your leds light up opposite. 1 is first led for this encoder,7 is last led. change led values for each enc.
-    int numLedsToLight1 = map(encoderValues[1], 1023, 0, 8, 14);
-    int numLedsToLight2 = map(encoderValues[2], 1023, 0, 15, 21);
-    int numLedsToLight3 = map(encoderValues[3], 1023, 0, 22, 28);
-    int numLedsToLight4 = map(encoderValues[4], 1023, 0, 29, 35);
+    int numLedsToLight0 = map(encoderValues[0], 1023, 0, 7, 0);   // 1023 max enc val, 0 low enc val, swap if your leds light up opposite. 0 for first led value-set this as the last led for prev encoder, 7 for last, change dep # leds per enc you use.
+    int numLedsToLight1 = map(encoderValues[1], 1023, 0, 14, 7);
+    int numLedsToLight2 = map(encoderValues[2], 1023, 0, 21, 14);
+    int numLedsToLight3 = map(encoderValues[3], 1023, 0, 28, 21);
 
     FastLED.clear();   // clears leds that are not in use
-  for(int led = 1; led < numLedsToLight0; led++) {    // led 1 is first led for enc 0, led 8 is first led for enc 1 etc.
-      leds[led] = CRGB::Magenta; 
+  for(int led = 0; led < numLedsToLight0; led++) {    // led 0 for lowest val for enc 0, led 7 for lowest val for enc 1 etc.
+      leds[led] = CRGB::Turquoise; 
+      leds[led] %= 64;    // Reduce color to 25% (64/256ths) of its previous value, using "video" scaling, meaning: never fading to full black
   }
-  for(int led = 8; led < numLedsToLight1; led++) {
-      leds[led] = CRGB::Magenta; 
+  for(int led = 7; led < numLedsToLight1; led++) {
+      leds[led] = CRGB::MidnightBlue; 
+      leds[led] %= 64;
   }
-  for(int led = 15; led < numLedsToLight2; led++) { 
-      leds[led] = CRGB::Magenta; 
+  for(int led = 14; led < numLedsToLight2; led++) { 
+      leds[led] = CRGB( 0, 25, 25); 
+      leds[led] %= 64;
   }
-  for(int led = 22; led < numLedsToLight3; led++) { 
-      leds[led] = CRGB::Magenta; 
-  }
-  for(int led = 29; led < numLedsToLight4; led++) { 
-      leds[led] = CRGB::Magenta; 
+  for(int led = 21; led < numLedsToLight3; led++) { 
+      leds[led] = CRGB::DarkOrchid; 
+      leds[led] %= 64;
   }
 
   FastLED.show();   // lights leds to match enc values
+  digitalWrite(LED_PWR, HIGH); // turn LED_PWR pin High 
 }
 
 
@@ -165,21 +170,6 @@ void EN3_A_ISR(){
 /******************/
 /******************/
 
-
-/******************/
-/* ENCODER 4 ISRs */
-/******************/
-void EN4_A_ISR(){
-  if(digitalRead(encoderPinsB[4])){
-    encoderValues[4] += enc_inc;
-  } else{
-    encoderValues[4] -= enc_inc;
-  }
-  encoderValues[4] = constrain(encoderValues[4], 0, 1023);
-}
-
-/******************/
-/******************/
 
 void printEncoderValues() {
   for (int i = 0; i < NUM_ENCODERS; i++) {
