@@ -4,7 +4,7 @@
 #include <FastLED.h>   // FastLED Library
 #define NUM_LEDS 28   // Define Number of LED's total
 #define DATA_PIN 16   // Data Pin used for LED 
-#define LED_PWR 15   // pin to determine if pc in on
+#define LED_PWR 15   // pin to determine if usb from pc has power
 
 CRGB leds[NUM_LEDS];
 
@@ -70,26 +70,30 @@ void loop() {
     int numLedsToLight2 = map(encoderValues[2], 1023, 0, 21, 14);
     int numLedsToLight3 = map(encoderValues[3], 1023, 0, 28, 21);
 
-    FastLED.clear();   // clears leds that are not in use
-  for(int led = 0; led < numLedsToLight0; led++) {    // led 0 for lowest val for enc 0, led 7 for lowest val for enc 1 etc.
-      leds[led] = CRGB::Turquoise; 
-      leds[led] %= 64;    // Reduce color to 25% (64/256ths) of its previous value, using "video" scaling, meaning: never fading to full black
-  }
-  for(int led = 7; led < numLedsToLight1; led++) {
-      leds[led] = CRGB::MidnightBlue; 
-      leds[led] %= 64;
-  }
-  for(int led = 14; led < numLedsToLight2; led++) { 
-      leds[led] = CRGB( 0, 25, 25); 
-      leds[led] %= 64;
-  }
-  for(int led = 21; led < numLedsToLight3; led++) { 
-      leds[led] = CRGB::DarkOrchid; 
-      leds[led] %= 64;
-  }
-
-  FastLED.show();   // lights leds to match enc values
-  digitalWrite(LED_PWR, HIGH); // turn LED_PWR pin High 
+ if (digitalRead(LED_PWR) == HIGH) {     // Power is on, light up LEDs based on encoder values
+   FastLED.clear(); 
+   for (int led = 0; led < numLedsToLight0; led++) {
+     leds[led] = CRGB::Turquoise;
+     leds[led] %= 70;
+   }
+   for (int led = 7; led < numLedsToLight1; led++) {
+     leds[led] = CRGB::MidnightBlue;
+     leds[led] %= 70;
+   }
+   for (int led = 14; led < numLedsToLight2; led++) {
+     leds[led] = CRGB(0, 25, 25);
+     leds[led] %= 70;
+   }
+   for (int led = 21; led < numLedsToLight3; led++) {
+     leds[led] = CRGB::DarkOrchid;
+     leds[led] %= 70;
+   }
+   FastLED.show();
+ } 
+ else {    // Power is lost, turn off all LEDs
+   FastLED.clear();
+   FastLED.show();
+ }
 }
 
 
